@@ -1,21 +1,18 @@
 import { AmountInput } from '@alfalab/core-components/amount-input/cssm';
 import { Button } from '@alfalab/core-components/button/cssm';
-import { CalendarMobile } from '@alfalab/core-components/calendar/cssm/mobile';
 import { Collapse } from '@alfalab/core-components/collapse/cssm';
 import { Divider } from '@alfalab/core-components/divider/cssm';
-
 import { Gap } from '@alfalab/core-components/gap/cssm';
-import { Input } from '@alfalab/core-components/input/cssm';
 import { PureCell } from '@alfalab/core-components/pure-cell/cssm';
-import { SelectMobile } from '@alfalab/core-components/select/cssm/mobile';
+import { Radio } from '@alfalab/core-components/radio/cssm';
+import { Status } from '@alfalab/core-components/status/cssm';
 import { Steps } from '@alfalab/core-components/steps/cssm';
 import { Switch } from '@alfalab/core-components/switch/cssm';
 import { Typography } from '@alfalab/core-components/typography/cssm';
-import { CalendarMIcon } from '@alfalab/icons-glyph/CalendarMIcon';
 import { CheckmarkMIcon } from '@alfalab/icons-glyph/CheckmarkMIcon';
 import { ChevronDownMIcon } from '@alfalab/icons-glyph/ChevronDownMIcon';
+import { ChevronRightMIcon } from '@alfalab/icons-glyph/ChevronRightMIcon';
 import { ChevronUpMIcon } from '@alfalab/icons-glyph/ChevronUpMIcon';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import hb from './assets/hb.jpg';
@@ -25,11 +22,14 @@ import img3 from './assets/img3.png';
 import img4 from './assets/img4.png';
 import img5 from './assets/img5.png';
 import img6 from './assets/img6.png';
+import op1Img from './assets/op1.png';
+import op2Img from './assets/op2.png';
+import op3Img from './assets/op3.png';
+import op4Img from './assets/op4.png';
 import p1Img from './assets/p1.png';
 import p2Img from './assets/p2.png';
 import p3Img from './assets/p3.png';
 import p4Img from './assets/p4.png';
-import rubIcon from './assets/rub.png';
 import { useStocksData } from './hooks/useStocksData';
 import { LS, LSKeys } from './ls';
 import { appSt } from './style.css';
@@ -110,33 +110,140 @@ const faqs = [
   },
 ];
 
-const INVEST_MIN = 2_000;
-const INVEST_MAX = 3_000_000;
+const strategies = [
+  {
+    name: 'Облигации с переменным купоном',
+    risk: 'НИЗКИЙ РИСК',
+    color: 'green',
+    income: '8-17%',
+    minSum: '100 ₽',
+    itemBlue: {
+      text: '97,58% облигации',
+      width: '97%',
+    },
+    itemPink: {
+      text: '2,42% Муниципальные ценные бумаги',
+    },
+  },
+  {
+    name: 'Тихая гавань 2.0',
+    risk: 'НИЗКИЙ РИСК',
+    color: 'green',
+    income: '12-17%',
+    minSum: '100 ₽',
+    itemBlue: {
+      text: '90,66% Паи фондов',
+      width: '90%',
+    },
+    itemPink: {
+      text: '9,27% Облигации',
+    },
+  },
+  {
+    name: 'Золото 2',
+    risk: 'СРЕДНИЙ РИСК',
+    color: 'orange',
+    income: '19-22%',
+    minSum: '100 ₽',
+    itemBlue: {
+      text: '100% паи биржевого фонда',
+      width: '100%',
+    },
+  },
+  {
+    name: 'Квант',
+    risk: 'ВЫСОКИЙ РИСК',
+    color: 'red',
+    income: '20-25%',
+    minSum: '100 ₽',
+    itemBlue: {
+      text: '100% акции',
+      width: '100%',
+    },
+  },
+];
 
-type OptionKey = 'per_month' | 'per_week' | 'per_quarter' | 'per_annual';
+const openingSteps = [
+  {
+    title: 'Накопить на жилье',
+    img: op1Img,
+    link: 'buildings' as const,
+  },
+  {
+    title: 'Пассивный доход',
+    img: op2Img,
+    link: 'passive' as const,
+  },
+  {
+    title: 'Сохранить от инфляции',
+    img: op3Img,
+    link: 'inflation' as const,
+  },
+  {
+    title: 'Попробовать инвестиции',
+    img: op4Img,
+    link: 'invest' as const,
+  },
+];
 
-const OPTIONS = [
-  { key: 'per_month', content: 'Раз в месяц' },
-  { key: 'per_week', content: 'Раз в неделю' },
-  { key: 'per_quarter', content: 'Раз в квартал' },
-  { key: 'per_annual', content: 'Раз в год' },
+const fonds = [
+  {
+    name: 'Накопительный',
+    forPpl: 'Для осторожных инвесторов',
+    risk: 'НИЗКИЙ РИСК',
+    color: 'green',
+    income: '9-12%',
+    itemBlue: {
+      text: '99.8% корпоративные облигации',
+      width: '95%',
+    },
+    itemPink: {
+      text: '0,2% ценные бумаги РФ',
+    },
+  },
+  {
+    name: 'Облигации Плюс',
+    forPpl: 'Для сбалансированного дохода',
+    risk: 'СРЕДНИЙ РИСК',
+    color: 'orange',
+    income: '11-32%',
+    itemBlue: {
+      text: '61,7% корпоративные облигации',
+      width: '62%',
+    },
+    itemPink: {
+      text: '38,3% ценные бумаги РФ',
+    },
+  },
+  {
+    name: 'Ликвидные акции',
+    forPpl: 'Для агрессивных инвесторов',
+    risk: 'ВЫСОКИЙ РИСК',
+    color: 'red',
+    income: '9-33%',
+    itemBlue: {
+      text: '84,7% акции',
+      width: '85%',
+    },
+    itemPink: {
+      text: '15,3% ценные бумаги РФ',
+    },
+  },
 ];
 
 export const App = () => {
   const [loading, setLoading] = useState(false);
   const [thxShow, setThx] = useState(LS.getItem(LSKeys.ShowThx, false));
   const [collapsedItems, setCollapsedItem] = useState<string[]>([]);
-  const [steps, setSteps] = useState<'init' | 'sums' | 'opening'>();
-  const [sum, setSum] = useState(INVEST_MIN);
-  const [error, setError] = useState('');
-  const [autoSum, setAutoSum] = useState(0);
-  const [checked, setChecked] = useState(true);
-  const [errorAutoSum, setErrorAutomSum] = useState('');
-  const [payDate, setPayDate] = useState(dayjs().add(1, 'month').toDate().toISOString());
-  const [openBs, setOpenBs] = useState(false);
-  const [perItem, setPerItem] = useState<OptionKey>('per_month');
+  const [steps, setSteps] = useState<'init' | 'opening' | 'buildings' | 'passive' | 'inflation' | 'invest'>();
+  const [selectedStrategy, setSelectedStrategy] = useState('');
   const [stockSlots, setStockSlots] = useState<{ ticker: string; lots: number }[]>([]);
-  const { stocks } = useStocksData();
+  const [bondsSlots, setBondsSlots] = useState<{ ticker: string; lots: number }[]>([]);
+  const [selectedFund, setSelectedFund] = useState('');
+
+  const {
+    dataAll: { bonds, stocks },
+  } = useStocksData();
 
   useEffect(() => {
     if (!LS.getItem(LSKeys.UserId, null)) {
@@ -162,53 +269,181 @@ export const App = () => {
     setLoading(false);
   };
 
-  const handleChangeInput = (_: React.ChangeEvent<HTMLInputElement> | null, { value }: { value: number | null }) => {
-    if (error) {
-      setError('');
-    }
-    setSum(value ?? 0);
-  };
-
-  const handleChangeInputAutoSum = (_: React.ChangeEvent<HTMLInputElement> | null, { value }: { value: number | null }) => {
-    if (errorAutoSum) {
-      setErrorAutomSum('');
-    }
-    setAutoSum(value ?? 0);
-  };
-
-  const goNext = () => {
-    if (sum < INVEST_MIN || sum > INVEST_MAX) {
-      setError(`От ${INVEST_MIN.toLocaleString('ru-RU')} до ${INVEST_MAX.toLocaleString('ru-RU')} ₽`);
-      return;
-    }
-
-    if (!autoSum && checked) {
-      setErrorAutomSum('Введите сумму автоплатежа');
-      return;
-    }
-    setSteps('opening');
-  };
-
   if (thxShow) {
     return <ThxLayout />;
   }
 
-  if (steps === 'opening') {
+  if (steps === 'invest') {
     return (
       <>
         <div className={appSt.container}>
-          <Gap size={8} />
-          <WaitIcon />
-          <Typography.TitleResponsive tag="h1" view="small" font="system" weight="semibold">
-            ИИС открывается
+          <Typography.TitleResponsive style={{ marginTop: '1rem' }} tag="h1" view="medium" font="system" weight="semibold">
+            Выберите фонд
           </Typography.TitleResponsive>
-          <Typography.Text view="primary-medium" color="secondary">
-            Предлагаем на выбор ТОП-10 активов Московской биржи для первых инвестиций
+
+          {fonds.map((fond, index) => (
+            <div
+              className={appSt.boxInfo({ selected: selectedFund === fond.name })}
+              key={index}
+              onClick={() => setSelectedFund(fond.name)}
+            >
+              <div className={appSt.rowSb}>
+                <Status view="contrast" color={fond.color as 'red' | 'green' | 'orange'} size={20}>
+                  <Typography.Text view="secondary-small" weight="bold">
+                    {fond.risk}
+                  </Typography.Text>
+                </Status>
+
+                <Radio checked={selectedFund === fond.name} onChange={() => setSelectedFund(fond.name)} />
+              </div>
+
+              <div>
+                <Typography.TitleResponsive tag="h4" view="small" font="system" weight="semibold">
+                  {fond.name}
+                </Typography.TitleResponsive>
+                <Typography.Text view="primary-small">{fond.forPpl}</Typography.Text>
+              </div>
+
+              <div>
+                <Typography.Text view="component-secondary" color="secondary" className={appSt.row}>
+                  Доходность:
+                  <Typography.TitleResponsive tag="h5" view="xsmall" font="system" weight="bold" color="positive">
+                    {fond.income}
+                  </Typography.TitleResponsive>
+                </Typography.Text>
+              </div>
+
+              <div className={appSt.btms}>
+                <Typography.Text view="component-secondary" color="secondary">
+                  Состав портфеля
+                </Typography.Text>
+
+                <div className={appSt.progressBarContainer}>
+                  <div className={appSt.progressBarFill} style={{ width: fond.itemBlue.width }} />
+                </div>
+
+                <div className={appSt.row}>
+                  <div className={appSt.dot({ color: 'blue' })} />
+                  <Typography.Text view="component-secondary" color="secondary">
+                    {fond.itemBlue.text}
+                  </Typography.Text>
+                </div>
+                <div className={appSt.row}>
+                  <div className={appSt.dot({ color: 'pink' })} />
+                  <Typography.Text view="component-secondary" color="secondary">
+                    {fond.itemPink.text}
+                  </Typography.Text>
+                </div>
+              </div>
+            </div>
+          ))}
+          <Typography.Text view="primary-small" color="secondary">
+            Не является индивидуальной инвестиционной рекомендацией
           </Typography.Text>
         </div>
 
-        <div style={{ borderRadius: '1rem 1rem 0 0', backgroundColor: '#F6F6FD' }} className={appSt.container}>
-          <Typography.TitleResponsive tag="h2" view="small" font="system" weight="semibold">
+        <Gap size={96} />
+
+        <div className={appSt.bottomBtn}>
+          <Button block view="primary" onClick={submit} loading={loading}>
+            Продолжить
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  if (steps === 'inflation') {
+    return (
+      <>
+        <div className={appSt.container}>
+          <Typography.TitleResponsive style={{ marginTop: '1rem' }} tag="h1" view="medium" font="system" weight="semibold">
+            Выберите активы
+          </Typography.TitleResponsive>
+
+          {bonds.map(stock => {
+            const isBondSelected = bondsSlots.some(slot => slot.ticker === stock.ticker);
+            const value = bondsSlots.find(slot => slot.ticker === stock.ticker)?.lots ?? 1;
+            return (
+              <div key={stock.ticker} className={appSt.stockBox}>
+                <PureCell>
+                  <PureCell.Graphics verticalAlign="center">
+                    <img src={stock.img} width={48} height={48} alt={stock.ticker} />
+                  </PureCell.Graphics>
+                  <PureCell.Content>
+                    <PureCell.Main>
+                      <Typography.Text view="primary-medium" weight="bold">
+                        {stock.name}
+                      </Typography.Text>
+
+                      <Typography.Text view="primary-small" color="secondary">
+                        Текущая цена: {stock.price_today.toLocaleString('ru-RU')} ₽
+                      </Typography.Text>
+                    </PureCell.Main>
+                  </PureCell.Content>
+                  <PureCell.Addon verticalAlign="center">
+                    <Switch
+                      checked={isBondSelected}
+                      onChange={() => {
+                        // add or remove from bondsSlots
+                        setBondsSlots(slots => {
+                          if (slots.some(slot => slot.ticker === stock.ticker)) {
+                            return slots.filter(slot => slot.ticker !== stock.ticker);
+                          } else {
+                            return [...slots, { ticker: stock.ticker, lots: 1 }];
+                          }
+                        });
+                      }}
+                    />
+                  </PureCell.Addon>
+                </PureCell>
+
+                {isBondSelected && (
+                  <>
+                    <Divider />
+
+                    <AmountInput
+                      value={value}
+                      labelView="outer"
+                      label={`1 лот = ${stock.lot} шт`}
+                      minority={1}
+                      bold={false}
+                      suffix={getWordEnding(value, ['лот', 'лота', 'лотов'])}
+                      block
+                      onChange={(_, { value }) => {
+                        setBondsSlots(slots =>
+                          slots.map(slot => (slot.ticker === stock.ticker ? { ...slot, lots: value || 1 } : slot)),
+                        );
+                      }}
+                      stepper={{ step: 1, min: 1, max: 1_000 }}
+                    />
+                  </>
+                )}
+              </div>
+            );
+          })}
+
+          <Typography.Text view="primary-small" color="secondary">
+            Не является индивидуальной инвестиционной рекомендацией
+          </Typography.Text>
+        </div>
+
+        <Gap size={96} />
+
+        <div className={appSt.bottomBtn}>
+          <Button block view="primary" onClick={submit} loading={loading}>
+            Продолжить
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  if (steps === 'passive') {
+    return (
+      <>
+        <div className={appSt.container}>
+          <Typography.TitleResponsive style={{ marginTop: '1rem' }} tag="h1" view="medium" font="system" weight="semibold">
             Выберите активы
           </Typography.TitleResponsive>
 
@@ -279,111 +514,146 @@ export const App = () => {
           </Typography.Text>
         </div>
 
-        <Gap size={128} />
+        <Gap size={96} />
 
-        <div className={appSt.bottomBtn} style={{ backgroundColor: '#F6F6FD' }}>
+        <div className={appSt.bottomBtn}>
           <Button block view="primary" onClick={submit} loading={loading}>
-            Добавить в портфель
-          </Button>
-          <Button block view="secondary" onClick={submit} loading={loading}>
-            Пропустить
+            Продолжить
           </Button>
         </div>
       </>
     );
   }
-  if (steps === 'sums') {
+
+  if (steps === 'buildings') {
     return (
       <>
         <div className={appSt.container}>
           <Typography.TitleResponsive style={{ marginTop: '1rem' }} tag="h1" view="medium" font="system" weight="semibold">
-            Сумма взноса
+            Выберите стратегию
           </Typography.TitleResponsive>
-          <div>
-            <Typography.Text view="primary-small" color="secondary" tag="p" defaultMargins={false}>
-              Счёт списания
-            </Typography.Text>
 
-            <div className={appSt.bannerAccount}>
-              <img src={rubIcon} width={48} height={48} alt="rubIcon" />
+          {strategies.map((strategy, index) => (
+            <div
+              className={appSt.boxInfo({ selected: selectedStrategy === strategy.name })}
+              key={index}
+              onClick={() => setSelectedStrategy(strategy.name)}
+            >
+              <div className={appSt.rowSb}>
+                <Status view="contrast" color={strategy.color as 'red' | 'green' | 'orange'} size={20}>
+                  <Typography.Text view="secondary-small" weight="bold">
+                    {strategy.risk}
+                  </Typography.Text>
+                </Status>
 
-              <Typography.Text view="primary-small" weight="medium">
-                Текущий счёт
-              </Typography.Text>
+                <Radio checked={selectedStrategy === strategy.name} onChange={() => setSelectedStrategy(strategy.name)} />
+              </div>
+
+              <div>
+                <Typography.TitleResponsive tag="h4" view="small" font="system" weight="semibold">
+                  {strategy.name}
+                </Typography.TitleResponsive>
+              </div>
+
+              <div>
+                <Typography.Text view="component-secondary" color="secondary" className={appSt.row}>
+                  Доходность:
+                  <Typography.TitleResponsive tag="h5" view="xsmall" font="system" weight="bold" color="positive">
+                    {strategy.income}
+                  </Typography.TitleResponsive>
+                </Typography.Text>
+              </div>
+
+              <div>
+                <Typography.Text view="component-secondary" color="secondary" className={appSt.row}>
+                  Минимальная сумма
+                  <Typography.TitleResponsive tag="h5" view="xsmall" font="system" weight="bold" color="primary">
+                    {strategy.minSum}
+                  </Typography.TitleResponsive>
+                </Typography.Text>
+              </div>
+
+              <div className={appSt.btms}>
+                <Typography.Text view="component-secondary" color="secondary">
+                  Состав портфеля
+                </Typography.Text>
+
+                <div className={appSt.progressBarContainer}>
+                  <div className={appSt.progressBarFill} style={{ width: strategy.itemBlue.width }} />
+                </div>
+
+                <div className={appSt.row}>
+                  <div className={appSt.dot({ color: 'blue' })} />
+                  <Typography.Text view="component-secondary" color="secondary">
+                    {strategy.itemBlue.text}
+                  </Typography.Text>
+                </div>
+                {strategy.itemPink && (
+                  <div className={appSt.row}>
+                    <div className={appSt.dot({ color: 'pink' })} />
+                    <Typography.Text view="component-secondary" color="secondary">
+                      {strategy.itemPink.text}
+                    </Typography.Text>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-
-          <AmountInput
-            label="Сумма взноса"
-            labelView="outer"
-            value={sum}
-            error={error}
-            hint={`От ${INVEST_MIN.toLocaleString('ru-RU')} до ${INVEST_MAX.toLocaleString('ru-RU')} ₽`}
-            onChange={handleChangeInput}
-            block
-            minority={1}
-            bold={false}
-          />
-
-          <Switch block reversed checked={checked} label="Пополнять регулярно" onChange={() => setChecked(!checked)} />
-
-          {checked && (
-            <>
-              <AmountInput
-                label="Сумма автоплатежа"
-                labelView="outer"
-                value={autoSum}
-                error={errorAutoSum}
-                onChange={handleChangeInputAutoSum}
-                block
-                minority={1}
-                bold={false}
-              />
-
-              <SelectMobile
-                options={OPTIONS}
-                label="Буду вносить"
-                labelView="outer"
-                block
-                selected={perItem}
-                onChange={p => setPerItem((p.selected?.key ?? 'per_month') as OptionKey)}
-              />
-
-              <Input
-                label="Первый платёж"
-                labelView="outer"
-                value={payDate ? dayjs(payDate).format('DD.MM.YYYY') : undefined}
-                disabled={!perItem}
-                block
-                rightAddons={<CalendarMIcon color="#898991" />}
-                onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setOpenBs(true);
-                }}
-              />
-            </>
-          )}
+          ))}
+          <Typography.Text view="primary-small" color="secondary">
+            Не является индивидуальной инвестиционной рекомендацией
+          </Typography.Text>
         </div>
 
         <Gap size={96} />
 
         <div className={appSt.bottomBtn}>
-          <Button block view="primary" onClick={goNext}>
+          <Button block view="primary" onClick={submit} loading={loading}>
             Продолжить
           </Button>
         </div>
+      </>
+    );
+  }
 
-        <CalendarMobile
-          value={payDate ? dayjs(payDate).toDate().getTime() : undefined}
-          selectorView={'full'}
-          yearsAmount={2}
-          onClose={() => setOpenBs(false)}
-          open={openBs}
-          minDate={dayjs().toDate().getTime()}
-          maxDate={dayjs().add(2, 'year').toDate().getTime()}
-          onChange={date => setPayDate(dayjs(date).toDate().toISOString())}
-        />
+  if (steps === 'opening') {
+    return (
+      <>
+        <div className={appSt.container}>
+          <Gap size={8} />
+          <WaitIcon />
+          <Typography.TitleResponsive tag="h1" view="small" font="system" weight="semibold">
+            ИИС открывается
+          </Typography.TitleResponsive>
+          <div style={{ borderRadius: '1rem', backgroundColor: '#F6F6FD' }} className={appSt.container}>
+            <Typography.TitleResponsive tag="h4" view="xsmall" font="system" weight="semibold">
+              Выберите цель инвестирования и мы подберем активы
+            </Typography.TitleResponsive>
+
+            {openingSteps.map((adv, index) => (
+              <PureCell key={index} className={appSt.openingCell} onClick={() => setSteps(adv.link)}>
+                <PureCell.Graphics verticalAlign="center">
+                  <img src={adv.img} width={48} height={48} alt="house" />
+                </PureCell.Graphics>
+                <PureCell.Content>
+                  <PureCell.Main>
+                    <Typography.Text view="primary-small">{adv.title}</Typography.Text>
+                  </PureCell.Main>
+                </PureCell.Content>
+                <PureCell.Graphics verticalAlign="center">
+                  <ChevronRightMIcon />
+                </PureCell.Graphics>
+              </PureCell>
+            ))}
+          </div>
+        </div>
+
+        <Gap size={96} />
+
+        <div className={appSt.bottomBtn}>
+          <Button block view="secondary" onClick={submit} loading={loading}>
+            Пропустить
+          </Button>
+        </div>
       </>
     );
   }
@@ -515,7 +785,7 @@ export const App = () => {
           <div key={index}>
             <div
               onClick={() => {
-                window.gtag('event', '7132_bundle_faq', { faq: String(index + 1), var: 'var3' });
+                window.gtag('event', '7132_bundle_faq', { faq: String(index + 1), var: 'var4' });
 
                 setCollapsedItem(items =>
                   items.includes(String(index + 1))
@@ -555,7 +825,7 @@ export const App = () => {
           block
           view="primary"
           onClick={() => {
-            setSteps('sums');
+            setSteps('opening');
           }}
         >
           К оформлению
