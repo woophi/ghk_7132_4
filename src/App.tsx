@@ -252,8 +252,10 @@ export const App = () => {
     }
   }, []);
 
-  const submit = () => {
-    window.gtag('event', '7132_next_click', { var: 'var4' });
+  const submit = (skipLog?: boolean) => {
+    if (!skipLog) {
+      window.gtag('event', '7132_next_click', { var: 'var4' });
+    }
     setLoading(true);
 
     let activeList = 'none';
@@ -367,7 +369,7 @@ export const App = () => {
         <Gap size={96} />
 
         <div className={appSt.bottomBtn}>
-          <Button block view="primary" onClick={submit} loading={loading}>
+          <Button block view="primary" onClick={() => submit()} loading={loading}>
             Продолжить
           </Button>
         </div>
@@ -453,7 +455,7 @@ export const App = () => {
         <Gap size={96} />
 
         <div className={appSt.bottomBtn}>
-          <Button block view="primary" onClick={submit} loading={loading}>
+          <Button block view="primary" onClick={() => submit()} loading={loading}>
             Продолжить
           </Button>
         </div>
@@ -539,7 +541,7 @@ export const App = () => {
         <Gap size={96} />
 
         <div className={appSt.bottomBtn}>
-          <Button block view="primary" onClick={submit} loading={loading}>
+          <Button block view="primary" onClick={() => submit()} loading={loading}>
             Продолжить
           </Button>
         </div>
@@ -629,7 +631,7 @@ export const App = () => {
         <Gap size={96} />
 
         <div className={appSt.bottomBtn}>
-          <Button block view="primary" onClick={submit} loading={loading}>
+          <Button block view="primary" onClick={() => submit()} loading={loading}>
             Продолжить
           </Button>
         </div>
@@ -685,7 +687,7 @@ export const App = () => {
             view="secondary"
             onClick={() => {
               window.gtag('event', '7132_skip_click', { var: 'var4' });
-              submit();
+              submit(true);
             }}
             loading={loading}
           >
@@ -861,6 +863,8 @@ export const App = () => {
           block
           view="primary"
           onClick={() => {
+            window.gtag('event', '7132_start_click', { var: 'var4' });
+
             setSteps('opening');
           }}
         >
