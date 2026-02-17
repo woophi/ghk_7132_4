@@ -8,11 +8,7 @@ declare global {
 }
 
 type Payload = {
-  autopayments: 1 | 0;
-  limit: 1 | 0;
-  limit_sum: number;
-  insurance: 1 | 0;
-  email: 1 | 0;
+  active_list: string;
 };
 
 export const sendDataToGA = async (payload: Payload) => {
@@ -23,11 +19,11 @@ export const sendDataToGA = async (payload: Payload) => {
     }-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 
     await fetch(
-      'https://script.google.com/macros/s/AKfycbxcHgrbrpJDGqapkLM5baYBX40Q4CotD5cxxU-4_mdpm86bxbBXSESz1AkW_G-ubZWb/exec',
+      'https://script.google.com/macros/s/AKfycbw0KjtvJ965mKFrz-Oizt54zipdedsSbgKFTTLm7VFfpSLos8xm1zxhKTuSJTSBy-hh/exec',
       {
         redirect: 'follow',
         method: 'POST',
-        body: JSON.stringify({ date, ...payload, variant: 'variant4', id: LS.getItem(LSKeys.UserId, 0) }),
+        body: JSON.stringify({ datetime: date, ...payload, variant: '7132_4', user_id: LS.getItem(LSKeys.UserId, 0) }),
         headers: {
           'Content-Type': 'text/plain;charset=utf-8',
         },

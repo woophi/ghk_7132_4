@@ -34,6 +34,7 @@ import { useStocksData } from './hooks/useStocksData';
 import { LS, LSKeys } from './ls';
 import { appSt } from './style.css';
 import { ThxLayout } from './thx/ThxLayout';
+import { sendDataToGA } from './utils/events';
 import { getWordEnding } from './utils/words';
 import { WaitIcon } from './WaitIcon';
 
@@ -252,21 +253,42 @@ export const App = () => {
   }, []);
 
   const submit = () => {
+    window.gtag('event', '7132_next_click', { var: 'var4' });
     setLoading(true);
 
-    // sendDataToGA({
-    //   autopayments: Number(checked) as 1 | 0,
-    //   limit: Number(checked2) as 1 | 0,
-    //   limit_sum: limit ?? 0,
-    //   insurance: Number(checked3) as 1 | 0,
-    //   email: email ? 1 : 0,
-    // }).then(() => {
-    //   LS.setItem(LSKeys.ShowThx, true);
-    //   setThx(true);
-    //   setLoading(false);
-    // });
-    setThx(true);
-    setLoading(false);
+    let activeList = 'none';
+    switch (steps) {
+      case 'buildings':
+        activeList = selectedStrategy || 'none';
+        break;
+      case 'passive':
+        activeList =
+          stockSlots
+            .map(slot => `${stocks.find(stock => stock.ticker === slot.ticker)?.name || slot.ticker}: ${slot.lots}`)
+            .join('; ') || 'none';
+        break;
+      case 'inflation':
+        activeList =
+          bondsSlots
+            .map(slot => `${bonds.find(bond => bond.ticker === slot.ticker)?.name || slot.ticker}: ${slot.lots}`)
+            .join('; ') || 'none';
+        break;
+
+      case 'invest':
+        activeList = selectedFund || 'none';
+        break;
+
+      default:
+        break;
+    }
+
+    sendDataToGA({
+      active_list: activeList,
+    }).then(() => {
+      LS.setItem(LSKeys.ShowThx, true);
+      setThx(true);
+      setLoading(false);
+    });
   };
 
   if (thxShow) {
@@ -630,7 +652,15 @@ export const App = () => {
             </Typography.TitleResponsive>
 
             {openingSteps.map((adv, index) => (
-              <PureCell key={index} className={appSt.openingCell} onClick={() => setSteps(adv.link)}>
+              <PureCell
+                key={index}
+                className={appSt.openingCell}
+                onClick={() => {
+                  window.gtag('event', '7132_goal_select_var4', { goal: adv.title });
+
+                  setSteps(adv.link);
+                }}
+              >
                 <PureCell.Graphics verticalAlign="center">
                   <img src={adv.img} width={48} height={48} alt="house" />
                 </PureCell.Graphics>
@@ -650,7 +680,15 @@ export const App = () => {
         <Gap size={96} />
 
         <div className={appSt.bottomBtn}>
-          <Button block view="secondary" onClick={submit} loading={loading}>
+          <Button
+            block
+            view="secondary"
+            onClick={() => {
+              window.gtag('event', '7132_skip_click', { var: 'var4' });
+              submit();
+            }}
+            loading={loading}
+          >
             Пропустить
           </Button>
         </div>
@@ -785,8 +823,6 @@ export const App = () => {
           <div key={index}>
             <div
               onClick={() => {
-                window.gtag('event', '7132_bundle_faq', { faq: String(index + 1), var: 'var4' });
-
                 setCollapsedItem(items =>
                   items.includes(String(index + 1))
                     ? items.filter(item => item !== String(index + 1))
