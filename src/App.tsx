@@ -287,7 +287,6 @@ export const App = () => {
     sendDataToGA({
       active_list: activeList,
     }).then(() => {
-      LS.setItem(LSKeys.ShowThx, true);
       setThx(true);
       setLoading(false);
     });
